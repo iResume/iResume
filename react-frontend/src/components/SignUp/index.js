@@ -3,16 +3,15 @@ import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
-import Link from '@material-ui/core/Link';
-import Grid from '@material-ui/core/Grid';
+import { Link, withRouter } from 'react-router-dom';
 import Box from '@material-ui/core/Box';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import * as ROUTES from '../../constants/routes';
+import { withFirebase } from '../Firebase';
+import { getThemeProps } from '@material-ui/styles';
 
 function Copyright() {
   return (
@@ -56,43 +55,45 @@ const SignUpLink = () => (
 );
 
 
-const SignUp = (props) => {
+const SignUpPage = () => (
+  <div>
+    <SignUpForm />
+  </div>
+)
+
+const SignUpFormBase = ({firebase, history}) => {
     const classes = useStyles();
-    const [userName, setUserName] = useState('');
-    const [email, setEmail] = useState('');
-    const [passwordOne, setPasswordOne] = useState('');
-    const [passwordTwo, setPasswordTwo] = useState('');
+    const [values, setValues] = useState({
+      username: '',
+      email: '',
+      passwordOne: '',
+      passwordTwo: ''
+    });
     const [error, setError] = useState('');
 
-    const handleUserNameInput = e => {
-        setUserName(e.target.value);
-    };
-    const handleEmailInput = e => {
-        setEmail(e.target.value);
-    };
-    const handlePassword1Input = e => {
-        setPasswordOne(e.target.value);
-    };
-    const handlePassword2Input = e => {
-        setPasswordTwo(e.target.value);
+    const onChange = event => {
+      let { name, value } = event.target; // name/value from input element that changed
+      setValues({ ...values, [name]: value }); // update corresponding field in values object
     };
 
-    /*const onSubmit = event => {
-      props.firebase
-          .doCreateUserWithEmailAndPassword(email, passwordOne)
+    const onSubmit = (event, props) => {
+      firebase
+          .doCreateUserWithEmailAndPassword(values.email, values.passwordOne)
           .then(authUser => {
-            setUserName()
+            setValues({...values});
+            console.log(props);
+            history.push(ROUTES.HOME);
           })
       .catch(error => {
         setError(error)
       });
       event.preventDefault();
-    }*/
+    }
 
-    const isInvaid = passwordOne !== passwordTwo ||
-          passwordOne === '' ||
-          email === '' ||
-          userName === '';
+    const isInvaid = values.passwordOne !== values.passwordTwo ||
+          values.passwordOne === '' ||
+          values.email === '' ||
+          values.userName === '';
     return (
         <Container component="main" maxWidth="xs">
           <CssBaseline />
@@ -103,7 +104,7 @@ const SignUp = (props) => {
             <Typography component="h1" variant="h5">
               Sign Up
             </Typography>
-            <form className={classes.form} noValidate>
+            <form className={classes.form} onSubmit={onSubmit} noValidate>
               <TextField
                 variant="outlined"
                 margin="normal"
@@ -113,8 +114,8 @@ const SignUp = (props) => {
                 label="Username"
                 name="username"
                 autoFocus
-                value={userName}
-                onChange={handleUserNameInput}
+                value={values.username}
+                onChange={onChange}
                 type="text"
                 placeholder="Full Name"
               />
@@ -126,8 +127,8 @@ const SignUp = (props) => {
                 name="email"
                 label="Email Address"
                 autoFocus
-                value={email}
-                onChange={handleEmailInput}
+                value={values.email}
+                onChange={onChange}
                 type="text"
                 placeholder="Email Address"
               />
@@ -136,11 +137,11 @@ const SignUp = (props) => {
                 margin="normal"
                 required
                 fullWidth
-                name="password1"
+                name="passwordOne"
                 label="Password"
                 autoFocus
-                value={passwordOne}
-                onChange={handlePassword1Input}
+                value={values.passwordOne}
+                onChange={onChange}
                 type="password"
                 placeholder="password"
               />
@@ -149,11 +150,11 @@ const SignUp = (props) => {
                 margin="normal"
                 required
                 fullWidth
-                name="password2"
+                name="passwordTwo"
                 label="Confirm Password"
                 autoFocus
-                value={passwordTwo}
-                onChange={handlePassword2Input}
+                value={values.passwordTwo}
+                onChange={onChange}
                 type="password"
                 placeholder="Confirm Password"
               />
@@ -166,6 +167,8 @@ const SignUp = (props) => {
                 className={classes.submit}
                 >Submit
               </Button>
+              {error && <p>{error.message}</p>}
+              {!error && <p>{`Success`}</p>}
             </form>
           </div>
           <Box mt={8}>
@@ -262,6 +265,6 @@ class SignUpForm extends Component {
 
 }*/
 
-
-export default SignUp;
+const SignUpForm = withRouter(withFirebase(SignUpFormBase));
+export default SignUpPage;
 export {SignUpLink}
