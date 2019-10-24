@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -12,6 +12,12 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import * as ROUTES from '../../constants/routes';
+import {SignUpLink} from '../SignUp';
+import {
+  BrowserRouter as Router,
+  Route,
+} from 'react-router-dom';
 
 function Copyright() {
   return (
@@ -50,7 +56,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const App = () =>  {
+const SignIn = () =>  {
   const classes = useStyles();
   return (
     <Container component="main" maxWidth="xs">
@@ -105,9 +111,8 @@ const App = () =>  {
               </Link>
             </Grid>
             <Grid item>
-              <Link href="#" variant="body2">
-                {"Don't have an account? Sign Up"}
-              </Link>
+            <Link href="/signup" variant="body2">Don't have an account? Sign Up</Link>
+            
             </Grid>
           </Grid>
         </form>
@@ -119,4 +124,4 @@ const App = () =>  {
   );
 }
 
-export default App;
+export default SignIn;
