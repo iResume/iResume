@@ -11,7 +11,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import * as ROUTES from '../../constants/routes';
 import { withFirebase } from '../Firebase';
-import { getThemeProps } from '@material-ui/styles';
 
 function Copyright() {
   return (

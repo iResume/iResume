@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
-import Link from '@material-ui/core/Link';
+import { Link, withRouter } from 'react-router-dom';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
@@ -13,6 +13,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import * as ROUTES from '../../constants/routes';
+import { withFirebase } from '../Firebase';
 import {SignUpLink} from '../SignUp';
 import {
   BrowserRouter as Router,
@@ -56,8 +57,39 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const SignIn = () =>  {
+const SignInPage = () => (
+  <div>
+    <SignInForm />
+  </div>
+)
+
+const SignInFormBase = ({firebase, history}) =>  {
   const classes = useStyles();
+  const [values, setValues] = useState({
+    email: '',
+    password: ''
+  });
+  const [error, setError] = useState('');
+
+  const onChange = event => {
+    let { name, value } = event.target; // name/value from input element that changed
+    setValues({ ...values, [name]: value }); // update corresponding field in values object
+  };
+
+  const onSubmit = (event) => {
+    firebase
+      .doSignInWithEmailAndPassword(values.email, values.password)
+      .then(() => {
+        setValues({...values});
+        history.push(ROUTES.HOME);
+      })
+      .catch(error => {
+        setError(error);
+      });
+      event.preventDefault();
+  }
+  const isInvaid = values.password === '' || values.email === '';
+
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -68,7 +100,7 @@ const SignIn = () =>  {
         <Typography component="h1" variant="h5">
           Sign in
         </Typography>
-        <form className={classes.form} noValidate>
+        <form className={classes.form} onSubmit={onSubmit} noValidate>
           <TextField
             variant="outlined"
             margin="normal"
@@ -77,6 +109,8 @@ const SignIn = () =>  {
             id="email"
             label="Email Address"
             name="email"
+            value={values.email}
+            onChange={onChange}
             autoComplete="email"
             autoFocus
           />
@@ -89,6 +123,8 @@ const SignIn = () =>  {
             label="Password"
             type="password"
             id="password"
+            value={values.password}
+            onChange={onChange}
             autoComplete="current-password"
           />
           <FormControlLabel
@@ -96,14 +132,14 @@ const SignIn = () =>  {
             label="Remember me"
           />
           <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="primary"
-            className={classes.submit}
-          >
-            Sign In
-          </Button>
+                disabled={isInvaid}
+                type="submit"
+                fullWidth
+                variant="contained"
+                color="primary"
+                className={classes.submit}
+                >Sign In
+              </Button>
           <Grid container>
             <Grid item xs>
               <Link href="#" variant="body2">
@@ -115,6 +151,7 @@ const SignIn = () =>  {
             
             </Grid>
           </Grid>
+          {error && <p>{error.message}</p>}
         </form>
       </div>
       <Box mt={8}>
@@ -124,4 +161,5 @@ const SignIn = () =>  {
   );
 }
 
-export default SignIn;
+const SignInForm = withRouter(withFirebase(SignInFormBase));
+export default SignInPage;
