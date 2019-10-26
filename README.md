@@ -2,7 +2,7 @@
 ---
 ## Main
 ### Set up
-- In Terminal, `git clone <link>`(get link from Github project page)
+- In Terminal, in the correct folder `git clone <link>`(get link from Github project page)
 ### Run
 - `cd react-frontend`
 - Run `npm install`
